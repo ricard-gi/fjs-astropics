@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs'); // encrypt
 const uuid = require('uuid').v4; // universal id creation
 const multer = require('multer'); // file upload
 const fs = require('fs'); // file i/o
+const path = require('path');
 const sharp = require('sharp'); // image editing
 const jwt = require('jsonwebtoken'); // Importa la llibreria jsonwebtoken per a generar i verificar JWT
 
@@ -20,7 +21,7 @@ const imagesFile = 'data/images.json';
 
 // Funció per llegir els usuaris des del fitxer JSON
 function readUsers() {
-    const data =  fs.readFileSync(usersFile);
+    const data = fs.readFileSync(usersFile);
     return JSON.parse(data);
 }
 
@@ -43,13 +44,19 @@ function writeImages(data) {
 
 // Middleware per verificar el JWT en la cookie
 const checkToken = (req, res, next) => {
-    const token = req.cookies?.token; // Obté el token des de la cookie de la petició
+    let token = req.cookies?.token;// Obté el token des de la cookie de la petició 
+    if (!token) token = req.body?.token; // Obté el token des del body de POST
+    if (!token) token = req.headers['authorization']?.split(' ')[1]; //obté token de bearer auth
+
+    console.log('token', JSON.stringify(token))
+
     if (!token) {
         return res.status(401).json({ error: 'Unauthorized' }); // Retorna error 401 si no hi ha cap token
     }
     try {
         const decodedToken = jwt.verify(token, SECRET_KEY); // Verifica el token utilitzant la clau secreta
         req.userId = decodedToken.userId; // Estableix l'ID d'usuari a l'objecte de la petició
+        req.userName = decodedToken.userName; // Estableix l'ID d'usuari a l'objecte de la petició
         next(); // Passa al següent middleware
     } catch (error) {
         return res.status(401).json({ error: 'Invalid token' }); // Retorna error 401 si el token és invàlid
@@ -72,7 +79,7 @@ app.post('/api/login', (req, res) => {
     const token = jwt.sign({ userId: user.id, userName: user.name }, SECRET_KEY, { expiresIn: '2h' }); // Genera un token JWT vàlid durant 2 hores
     res.cookie('token', token, { httpOnly: false, maxAge: 7200000 }); // Estableix el token com una cookie
 
-    res.json({ message: 'Login successful', userId: user.id, name: user.name });
+    res.json({ message: 'Login successful', userId: user.id, name: user.name, token });
 });
 
 
@@ -131,7 +138,7 @@ app.post('/api/upload', checkToken, upload.single('image'), async (req, res) => 
             .toFile(`${imagesFolder}/${image.filename}`)
             .then(async () => {
                 // Eliminar la imatge original després de redimensionar-la i desar-la
-                await fs.unlink(image.path, (err)=>err?console.log(err):()=>{});
+                await fs.unlink(image.path, () => { });
             });
 
     } catch (error) {
@@ -139,9 +146,12 @@ app.post('/api/upload', checkToken, upload.single('image'), async (req, res) => 
         return res.status(500).json({ error: 'Failed to process image xx' });
     }
 
+    // req.userId='a5e876e1-6055-47f5-b532-383ee62a0fb5'
+    // req.userName='ricard'
+
     // Guardar la informació de la imatge al fitxer images.json
     const images = readImages();
-    images.push({ userId: req.userId, filename: image.filename, hashtags, timestamp: new Date().getTime() });
+    images.push({ userName: req.userName, userId: req.userId, image: image.filename, hashtags, timestamp: new Date().getTime() });
     fs.writeFileSync(imagesFile, JSON.stringify(images, null, 2));
 
     res.json({ message: 'Image uploaded successfully' });
@@ -155,6 +165,10 @@ app.get('/api/images', checkToken, (req, res) => {
     const userId = req.userId;
     const userImages = readImages().filter(image => image.userId === userId);
     res.json(userImages);
+});
+
+app.get('/api/allimages', (req, res) => {
+    res.json(readImages());
 });
 
 
@@ -174,7 +188,7 @@ app.get('/api/images/:hashtag', checkToken, (req, res) => {
 
 
 //Crear ruta estàtica per servir imatges a /uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/img', express.static(path.join(__dirname, 'uploads')));
 
 
 

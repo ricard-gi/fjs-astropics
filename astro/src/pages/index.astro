@@ -1,0 +1,27 @@
+---
+
+import Picture from "../components/Picture.astro"
+
+
+let x = await fetch('http://localhost:3000/api/allimages')
+const images = await x.json()
+
+
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Astro</title>
+	</head>
+	<body>
+		<h1>Astro</h1>
+
+		{
+			images.map(e => <Picture pic={e} />)
+		}
+	</body>
+</html>

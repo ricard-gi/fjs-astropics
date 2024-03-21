@@ -1,0 +1,43 @@
+---
+
+import Picture from "../../components/Picture.astro"
+const { hashtag } = Astro.params;
+
+if (!Astro.cookies.has('token')){
+return Astro.redirect('/login')
+}
+
+let token = Astro.cookies.get('token').value;
+
+const options = {headers: {Authorization: `Bearer ${token}`}};
+let images = []
+try{
+
+	let x = await fetch(`http://localhost:3000/api/images/${hashtag}`, options)
+	 images = await x.json()
+	 
+} catch (err) {
+	throw err
+}
+
+
+
+---
+
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Astro</title>
+	</head>
+	<body>
+		<h1>Astro</h1>
+
+		{
+			images.map(e => <Picture pic={e} />)
+		}
+	</body>
+</html>
