@@ -20,7 +20,7 @@ const imagesFile = 'images.json';
 
 // Funció per llegir els usuaris des del fitxer JSON
 function readUsers() {
-    const data = fs.readFileSync(usersFile);
+    const data =  fs.readFileSync(usersFile);
     return JSON.parse(data);
 }
 
@@ -120,7 +120,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage }); // Configura multer per a gestionar la pujada d'un únic fitxer amb el camp 'foto'
 
 // Funció per pujar una imatge amb hashtags
-app.post('/api/upload', upload.single('image'), async (req, res) => {
+app.post('/api/upload', checkToken, upload.single('image'), async (req, res) => {
     const { userId, hashtags } = req.body;
     const image = req.file;
 
@@ -141,10 +141,20 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
 
     // Guardar la informació de la imatge al fitxer images.json
     const images = readImages();
-    images.push({ userId, filename: image.filename, hashtags });
+    images.push({ userId: req.userId, filename: image.filename, hashtags });
     fs.writeFileSync(imagesFile, JSON.stringify(images, null, 2));
 
     res.json({ message: 'Image uploaded successfully' });
+});
+
+
+
+
+// Endpoint per obtenir les imatges d'un usuari
+app.get('/api/images', checkToken, (req, res) => {
+    const userId = req.userId;
+    const userImages = readImages().filter(image => image.userId === userId);
+    res.json(userImages);
 });
 
 
