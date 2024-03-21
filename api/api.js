@@ -7,6 +7,7 @@ const fs = require('fs');
 const sharp = require('sharp');
 const jwt = require('jsonwebtoken'); // Importa la llibreria jsonwebtoken per a generar i verificar JWT
 
+
 const SECRET_KEY = "vols-que-et-punxi-amb-un-punxo";
 
 const app = express();
