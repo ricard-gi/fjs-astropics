@@ -1,13 +1,13 @@
 const express = require('express');
-const cors = require('cors');
-const bcrypt = require('bcryptjs');
-const uuid = require('uuid').v4;
-const multer = require('multer');
-const fs = require('fs');
-const sharp = require('sharp');
+const cors = require('cors'); // cross-origin
+const bcrypt = require('bcryptjs'); // encrypt
+const uuid = require('uuid').v4; // universal id creation
+const multer = require('multer'); // file upload
+const fs = require('fs'); // file i/o
+const sharp = require('sharp'); // image editing
 const jwt = require('jsonwebtoken'); // Importa la llibreria jsonwebtoken per a generar i verificar JWT
 
-const SECRET_KEY = "vols-que-et-punxi-amb-un-punxo";
+const SECRET_KEY = "vols-que-et-punxi-amb-un-punxo"; // to be used in jsonwebtoken creation
 
 const app = express();
 app.use(express.json());
@@ -16,7 +16,6 @@ app.use(cors());
 const usersFile = 'users.json';
 const imagesFolder = 'uploads';
 const imagesFile = 'images.json';
-
 
 
 // Funció per llegir els usuaris des del fitxer JSON
@@ -48,7 +47,6 @@ const checkToken = (req, res, next) => {
     if (!token) {
         return res.status(401).json({ error: 'Unauthorized' }); // Retorna error 401 si no hi ha cap token
     }
-
     try {
         const decodedToken = jwt.verify(token, SECRET_KEY); // Verifica el token utilitzant la clau secreta
         req.userId = decodedToken.userId; // Estableix l'ID d'usuari a l'objecte de la petició
