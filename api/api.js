@@ -13,9 +13,9 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const usersFile = 'users.json';
+const usersFile = 'data/users.json';
 const imagesFolder = 'uploads';
-const imagesFile = 'images.json';
+const imagesFile = 'data/images.json';
 
 
 // Funció per llegir els usuaris des del fitxer JSON
@@ -36,7 +36,7 @@ function readImages() {
 }
 
 // Funció per escriure les imatges al fitxer JSON
-function writeUImages(data) {
+function writeImages(data) {
     fs.writeFileSync(imagesFile, JSON.stringify(data, null, 2));
 }
 
@@ -141,7 +141,7 @@ app.post('/api/upload', checkToken, upload.single('image'), async (req, res) => 
 
     // Guardar la informació de la imatge al fitxer images.json
     const images = readImages();
-    images.push({ userId: req.userId, filename: image.filename, hashtags });
+    images.push({ userId: req.userId, filename: image.filename, hashtags, timestamp: new Date().getTime() });
     fs.writeFileSync(imagesFile, JSON.stringify(images, null, 2));
 
     res.json({ message: 'Image uploaded successfully' });
@@ -173,9 +173,8 @@ app.get('/api/images/:hashtag', checkToken, (req, res) => {
 });
 
 
-//@TODO
 //Crear ruta estàtica per servir imatges a /uploads
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 
