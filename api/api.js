@@ -19,7 +19,6 @@ const imagesFile = 'images.json';
 
 
 
-
 // Funció per llegir els usuaris des del fitxer JSON
 function readUsers() {
     const data = fs.readFileSync(usersFile);
@@ -43,8 +42,6 @@ function writeUImages(data) {
 }
 
 
-
-
 // Middleware per verificar el JWT en la cookie
 const checkToken = (req, res, next) => {
     const token = req.cookies?.token; // Obté el token des de la cookie de la petició
@@ -62,11 +59,10 @@ const checkToken = (req, res, next) => {
 };
 
 
-
 // LOGIN
 // Endpoint per iniciar sessió d'un usuari
 
-app.post('/login', (req, res) => {
+app.post('/api/login', (req, res) => {
     const { name, password } = req.body;
     const users = readUsers();
 
@@ -83,7 +79,7 @@ app.post('/login', (req, res) => {
 
 
 // REFRESH verifica si token és vàlid
-app.get('/refresh', checkToken, async (req, res) => {
+app.get('/api/refresh', checkToken, async (req, res) => {
     const users = readUsers();
 
     const user = users.find(user => user.id === userId);
@@ -96,7 +92,7 @@ app.get('/refresh', checkToken, async (req, res) => {
 
 
 // Funció per registrar un nou usuari
-app.post('/register', (req, res) => {
+app.post('/api/register', (req, res) => {
     const { name, password } = req.body;
     const users = readUsers();
 
@@ -113,8 +109,6 @@ app.post('/register', (req, res) => {
 });
 
 
-
-
 // Configuració de multer per gestionar la pujada de fitxers
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -127,9 +121,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage }); // Configura multer per a gestionar la pujada d'un únic fitxer amb el camp 'foto'
 
-
 // Funció per pujar una imatge amb hashtags
-app.post('/upload', upload.single('image'), async (req, res) => {
+app.post('/api/upload', upload.single('image'), async (req, res) => {
     const { userId, hashtags } = req.body;
     const image = req.file;
 
@@ -143,7 +136,6 @@ app.post('/upload', upload.single('image'), async (req, res) => {
                 await fs.unlink(image.path, (err)=>err?console.log(err):()=>{});
             });
 
-
     } catch (error) {
         //throw error
         return res.status(500).json({ error: 'Failed to process image xx' });
@@ -154,24 +146,30 @@ app.post('/upload', upload.single('image'), async (req, res) => {
     images.push({ userId, filename: image.filename, hashtags });
     fs.writeFileSync(imagesFile, JSON.stringify(images, null, 2));
 
-
     res.json({ message: 'Image uploaded successfully' });
 });
 
 
 // Endpoint per obtenir les imatges d'un usuari
-app.get('/user/:userId/images', checkToken, (req, res) => {
+app.get('/api/user/:userId/images', checkToken, (req, res) => {
     const userId = req.params.userId;
     const userImages = readImages().filter(image => image.userId === userId);
     res.json(userImages);
 });
 
 // Endpoint per obtenir les imatges per hashtag
-app.get('/images/:hashtag', checkToken, (req, res) => {
+app.get('/api/images/:hashtag', checkToken, (req, res) => {
     const hashtag = req.params.hashtag;
     const hashtagImages = readImages().filter(image => image.hashtags.includes(hashtag));
     res.json(hashtagImages);
 });
+
+
+//@TODO
+//Crear ruta estàtica per servir imatges a /uploads
+
+
+
 
 // Inicialitzar el servidor
 const PORT = process.env.PORT || 3000;
