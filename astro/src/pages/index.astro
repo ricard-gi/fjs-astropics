@@ -1,27 +1,26 @@
 ---
+import Layout from '../layouts/Layout.astro'
 
 import Picture from "../components/Picture.astro"
 
 
+if (!Astro.cookies.has('token')){
+return Astro.redirect('/login')
+}
+
+
 let x = await fetch('http://localhost:3000/api/allimages')
 const images = await x.json()
+console.log
 
 
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
+<Layout title="images main" >
 
-		{
-			images.map(e => <Picture pic={e} />)
-		}
-	</body>
-</html>
+	{
+		images.map(e => <Picture pic={e} />)
+	}
+
+</Layout>
+

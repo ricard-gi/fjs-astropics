@@ -1,7 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import Picture from "../../components/Picture.astro"
-const { hashtag } = Astro.params;
+const { user } = Astro.params;
 
 if (!Astro.cookies.has('token')){
 return Astro.redirect('/login')
@@ -12,8 +12,7 @@ let token = Astro.cookies.get('token').value;
 const options = {headers: {Authorization: `Bearer ${token}`}};
 let images = []
 try{
-
-	let x = await fetch(`http://localhost:3000/api/images/hashtag/${hashtag}`, options)
+	let x = await fetch(`http://localhost:3000/api/images/user/${user}`, options)
 	 images = await x.json()
 	 
 } catch (err) {
@@ -21,11 +20,10 @@ try{
 }
 
 
-
 ---
 
-<Layout title={"images for hashstag "+hashtag}>
-    {
-        images.map(e => <Picture pic={e} />)
-    }
+<Layout title={"images from user "+user}>
+		{
+			images.map(e => <Picture pic={e} />)
+		}
 </Layout>

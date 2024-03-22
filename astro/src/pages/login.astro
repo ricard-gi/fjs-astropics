@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Tornar from "../components/Tornar.astro";
+
+let err = ""
 
 if (Astro.request.method === "POST") {
     const data = await Astro.request.formData();
@@ -17,14 +18,19 @@ if (Astro.request.method === "POST") {
 
     let resposta = await fetch("http://localhost:3000/api/login", options);
     resposta = await resposta.json();
-    const cookieOptions =  { httpOnly: false, maxAge: 7200000 }
+    
+    if (resposta.error) {
+        err = resposta.error;
+    } else {
+        const cookieOptions =  { httpOnly: false, maxAge: 7200000 }
     Astro.cookies.set('token', resposta.token, cookieOptions)
     return Astro.redirect('/')
+    }
+
 }
 ---
 
 <Layout titol="login...">
-    <Tornar url="/" />
 
     <form method="post">
         <div class="md:flex md:items-center mb-6">
@@ -51,7 +57,8 @@ if (Astro.request.method === "POST") {
                 />PASS
             </div>
         </div>
-
         <button type="submit">Enviar</button>
+        <br>
+        <p class="text-red-800">{err}</p>
     </form>
 </Layout>
