@@ -1,26 +1,19 @@
 ---
-import Layout from '../layouts/Layout.astro'
+import Layout from "../layouts/Layout.astro";
 
-import Picture from "../components/Picture.astro"
+import Picture from "../components/Picture.astro";
 
-
-if (!Astro.cookies.has('token')){
-return Astro.redirect('/login')
+if (!Astro.cookies.has("token")) {
+	return Astro.redirect("/login");
 }
 
-
-let x = await fetch('http://localhost:3000/api/allimages')
-const images = await x.json()
-console.log
-
-
+let x = await fetch("http://localhost:3000/api/allimages");
+const images = await x.json();
+console.log;
 ---
 
-<Layout title="images main" >
-
-	{
-		images.map(e => <Picture pic={e} />)
-	}
-
+<Layout title="all images">
+	<div class="grid grid-cols-4">
+		{images.map((e) => <Picture pic={e} />)}
+	</div>
 </Layout>
-

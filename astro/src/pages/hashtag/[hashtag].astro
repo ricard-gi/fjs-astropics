@@ -25,7 +25,16 @@ try{
 ---
 
 <Layout title={"images for hashstag "+hashtag}>
-    {
-        images.map(e => <Picture pic={e} />)
-    }
+
+
+    <div class="grid grid-cols-4">
+		{
+			images.map(e => <Picture pic={e} />)
+		}
+
+	</div>
+		
+
+
+
 </Layout>

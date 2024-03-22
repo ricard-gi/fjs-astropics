@@ -45,10 +45,9 @@ function writeImages(data) {
 // Middleware per verificar el JWT en la cookie
 const checkToken = (req, res, next) => {
     let token = req.cookies?.token;// Obté el token des de la cookie de la petició 
-    if (!token) token = req.body?.token; // Obté el token des del body de POST
     if (!token) token = req.headers['authorization']?.split(' ')[1]; //obté token de bearer auth
 
-    console.log('token', JSON.stringify(token))
+    //console.log('token', JSON.stringify(token))
 
     if (!token) {
         return res.status(401).json({ error: 'Unauthorized' }); // Retorna error 401 si no hi ha cap token
@@ -127,8 +126,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage }); // Configura multer per a gestionar la pujada d'un únic fitxer amb el camp 'foto'
 
 // Funció per pujar una imatge amb hashtags
-app.post('/api/upload', checkToken, upload.single('image'), async (req, res) => {
-    const { userId, hashtags } = req.body;
+app.post('/api/upload', checkToken, upload.single('file'), async (req, res) => {
+    const { hashtags } = req.body;
     const image = req.file;
 
     // Redimensionar la imatge abans de desar-la

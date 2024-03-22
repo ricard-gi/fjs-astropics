@@ -1,0 +1,85 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+let err = "";
+
+// si no hi ha token, anem a login
+if (!Astro.cookies.has("token")) {
+    return Astro.redirect("/login");
+}
+
+if (Astro.request.method === "POST") {
+    const data = await Astro.request.formData();
+    const comment = data.get("comentari");
+    const image = data.get("imatge") as File;
+
+    let token = Astro.cookies.get("token").value;
+
+    const dataSend = new FormData();
+    dataSend.append("hashtags", comment);
+    dataSend.append("file", image); //.files[0]);
+
+    const options = {
+        method: "POST",
+        body: dataSend,
+        headers: { Authorization: `Bearer ${token}` },
+    };
+
+    let x = await fetch("http://localhost:3000/api/upload", options);
+    x = await x.json();
+    console.log("x:", x);
+    if (x.error) {
+        err = x.error;
+    } else {
+        return Astro.redirect("/mypics");
+    }
+}
+---
+
+<Layout titol="penja foto...">
+    <div class="w-full max-w-md">
+        <form
+            method="post"
+            enctype="multipart/form-data"
+            class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+        >
+            <div class="mb-4">
+                <label
+                    class="block text-gray-700 text-sm font-bold mb-2"
+                    for="comentari"
+                >
+                    comentari
+                </label>
+                <input
+                    id="comentari"
+                    name="comentari"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    id="email"
+                    type="text"
+                    placeholder="Nom"
+                />
+            </div>
+
+            <label for="formfile" class="form-label" for="formfile">foto</label>
+            <input
+                class="form-control"
+                id="formfile"
+                type="file"
+                name="imatge"
+                accept="image/*"
+                capture="environment"
+            />
+
+            <div>
+                <button
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    type="submit"
+                >
+                    Desar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <p class="text-red-500">{err}</p>
+</Layout>

@@ -1,0 +1,31 @@
+---
+import Picture from "../components/Picture.astro";
+import Layout from "../layouts/Layout.astro";
+
+// si no hi ha token, anem a login
+if (!Astro.cookies.has("token")) {
+	return Astro.redirect("/login");
+}
+
+//tenim token, el posem a headers per poder fer la petició GET a la API
+let token = Astro.cookies.get("token").value;
+
+const options = { headers: { Authorization: `Bearer ${token}` } };
+let images;
+let err = "";
+
+images = await fetch("http://localhost:3000/api/images", options);
+images = await images.json();
+if (images.error) {
+	err = images.error;
+	images = [];
+}
+---
+
+<Layout title="imatges meves...">
+	<div class="grid grid-cols-4">
+		{images.map((e) => <Picture pic={e} />)}
+	</div>
+
+	<h1 class="text-red-700">{err}</h1>
+</Layout>
