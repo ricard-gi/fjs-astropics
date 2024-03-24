@@ -204,6 +204,7 @@ app.use('/img', express.static(path.join(__dirname, 'uploads')));
 
 const base = '/';
 app.use(base, express.static('../astro/dist/client/'));
+app.use(ssrHandler);
 
 
 // Inicialitzar el servidor
