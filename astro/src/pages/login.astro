@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import config from '../config';
 
 let err = "";
 
@@ -16,7 +17,7 @@ if (Astro.request.method === "POST") {
         body: JSON.stringify({ name: nom, password: pass }),
     };
 
-    let resposta = await fetch("http://localhost:3000/api/login", options);
+    let resposta = await fetch(`${config.API_URL}/login`, options);
     resposta = await resposta.json();
 
     if (resposta.error) {

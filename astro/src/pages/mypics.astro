@@ -1,6 +1,7 @@
 ---
 import Picture from "../components/Picture.astro";
 import Layout from "../layouts/Layout.astro";
+import config from "../config";
 
 // si no hi ha token, anem a login
 if (!Astro.cookies.has("token")) {
@@ -14,7 +15,7 @@ const options = { headers: { Authorization: `Bearer ${token}` } };
 let images;
 let err = "";
 
-images = await fetch("http://localhost:3000/api/images", options);
+images = await fetch(`${config.API_URL}/images`, options);
 images = await images.json();
 if (images.error) {
 	err = images.error;
@@ -23,7 +24,7 @@ if (images.error) {
 ---
 
 <Layout title="imatges meves...">
-	<div class="grid grid-cols-4 gap-6">
+	<div class="grid">
 		{images.map((e) => <Picture pic={e} />)}
 	</div>
 

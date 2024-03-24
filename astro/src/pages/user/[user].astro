@@ -1,6 +1,8 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import Picture from "../../components/Picture.astro";
+import config from "../../config";
+
 const { user } = Astro.params;
 
 if (!Astro.cookies.has("token")) {
@@ -16,7 +18,7 @@ const options = {
 let images = [];
 try {
 	let x = await fetch(
-		`http://localhost:3000/api/images/user/${user}`,
+	`${config.API_URL}/images/user/${user}`,
 		options,
 	);
 	images = await x.json();
@@ -26,7 +28,7 @@ try {
 ---
 
 <Layout title={"images from user " + user}>
-	<div class="grid grid-cols-4 gap-6">
+	<div class="grid">
 		{images.map((e) => <Picture pic={e} />)}
 	</div>
 </Layout>
