@@ -1,12 +1,18 @@
-const express = require('express');
-const cors = require('cors'); // cross-origin
-const bcrypt = require('bcryptjs'); // encrypt
-const uuid = require('uuid').v4; // universal id creation
-const multer = require('multer'); // file upload
-const fs = require('fs'); // file i/o
-const path = require('path');
-const sharp = require('sharp'); // image editing
-const jwt = require('jsonwebtoken'); // Importa la llibreria jsonwebtoken per a generar i verificar JWT
+import express from 'express';
+import cors from 'cors'; // cross-origin
+import bcrypt from 'bcryptjs'; // encrypt
+import { v4 as uuid } from 'uuid';
+import multer from 'multer'; // file upload
+import fs from 'fs'; // file i/o
+import path from 'path';
+import sharp from 'sharp'; // image editing
+import jwt from 'jsonwebtoken'; // Importa la llibreria jsonwebtoken per a generar i verificar JWT
+
+import { handler as ssrHandler } from '../astro/dist/server/entry.mjs';
+
+import * as url from 'url';
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const SECRET_KEY = "vols-que-et-punxi-amb-un-punxo"; // to be used in jsonwebtoken creation
 
@@ -196,6 +202,8 @@ app.get('/api/images/user/:name', checkToken, (req, res) => {
 //Crear ruta estàtica per servir imatges a /uploads
 app.use('/img', express.static(path.join(__dirname, 'uploads')));
 
+const base = '/';
+app.use(base, express.static('../astro/dist/client/'));
 
 
 // Inicialitzar el servidor
