@@ -156,7 +156,7 @@ app.post('/api/upload', checkToken, upload.single('file'), async (req, res) => {
 
     // Guardar la informació de la imatge al fitxer images.json
     const images = readImages();
-    images.push({ userName: req.userName, userId: req.userId, image: image.filename, hashtags, timestamp: new Date().getTime() });
+    images.unshift({ userName: req.userName, userId: req.userId, image: image.filename, hashtags, timestamp: new Date().getTime() });
     fs.writeFileSync(imagesFile, JSON.stringify(images, null, 2));
 
     res.json({ message: 'Image uploaded successfully' });
@@ -201,6 +201,7 @@ app.get('/api/images/user/:name', checkToken, (req, res) => {
 
 //Crear ruta estàtica per servir imatges a /uploads
 app.use('/img', express.static(path.join(__dirname, 'uploads')));
+
 /*
 const base = '/';
 app.use(base, express.static('../astro/dist/client/'));
@@ -208,7 +209,7 @@ app.use(ssrHandler);
 */
 
 app.get('/', (req,res)=>{
-    res.end("api...")
+    res.end("astropics api")
 })
 
 
