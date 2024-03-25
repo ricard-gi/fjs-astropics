@@ -93,12 +93,20 @@ app.get('/api/refresh', checkToken, async (req, res) => {
     const users = readUsers();
 
     const user = users.find(user => user.id === userId);
-    if (!user || !bcrypt.compareSync(password, user.password)) {
+    if (!user ) {
         return res.status(401).json({ error: 'User not found' });
     }
 
     return res.json({ id: user.id, name: user.name })
 })
+
+// retorna usuaris
+app.get('/api/users', checkToken, async (req, res) => {
+    const users = readUsers();
+    return res.json(users)
+})
+
+
 
 
 // Funció per registrar un nou usuari
@@ -115,7 +123,7 @@ app.post('/api/register', (req, res) => {
     const newUser = { id, name, password: bcrypt.hashSync(password, 8) };
     users.push(newUser);
     writeUsers(users);
-    res.json({ message: 'User registered successfully' });
+    res.json({ message: 'User registered successfully', id, name });
 });
 
 
@@ -198,6 +206,21 @@ app.get('/api/images/user/:name', checkToken, (req, res) => {
     res.json(nameImages);
 });
 
+
+// REFRESH verifica si token és vàlid
+app.delete('/api/users/:name', checkToken, async (req, res) => {
+    try{
+        const name = req.params.name;
+        const nameImages = readImages().filter(image => image.userName!==name);
+        writeImages(nameImages)
+        const users = readUsers().filter(usr => usr.name!==name)
+        writeUsers(users)
+        res.json({'message': `usuari ${name} eliminat`});
+    } catch (err) {
+        res.status(500).json({'error': 'error eliminant usuari'})
+    }
+
+})
 
 //Crear ruta estàtica per servir imatges a /uploads
 app.use('/img', express.static(path.join(__dirname, 'uploads')));
