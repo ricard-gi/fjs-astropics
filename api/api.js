@@ -92,7 +92,8 @@ app.post('/api/login', (req, res) => {
 app.get('/api/refresh', checkToken, async (req, res) => {
     const users = readUsers();
 
-    const user = users.find(user => user.id === userId);
+
+    const user = users.find(user => user.id === req.userId);
     if (!user ) {
         return res.status(401).json({ error: 'User not found' });
     }
