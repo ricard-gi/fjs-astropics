@@ -199,7 +199,7 @@ app.get('/api/user/:userId/images', checkToken, (req, res) => {
 // Endpoint per obtenir les imatges per hashtag
 app.get('/api/images/hashtag/:hashtag', checkToken, (req, res) => {
     const hashtag = req.params.hashtag;
-    const hashtagImages = readImages().filter(image => image.hashtags.includes('#'+hashtag+' '));
+    const hashtagImages = readImages().filter(image => (image.hashtags+' ').includes('#'+hashtag+' '));
     res.json(hashtagImages);
 });
 
