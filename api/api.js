@@ -122,6 +122,9 @@ app.post('/api/register', (req, res) => {
 
     const id = uuid();
     const newUser = { id, name, password: bcrypt.hashSync(password, 8) };
+
+    const token = jwt.sign({ userId: newUser.id, userName: newUser.name }, SECRET_KEY, { expiresIn: '2h' }); // Genera un token JWT vàlid durant 2 hores
+
     users.push(newUser);
     writeUsers(users);
     res.json({ message: 'User registered successfully', id, name, token });
