@@ -124,7 +124,7 @@ app.post('/api/register', (req, res) => {
     const newUser = { id, name, password: bcrypt.hashSync(password, 8) };
     users.push(newUser);
     writeUsers(users);
-    res.json({ message: 'User registered successfully', id, name });
+    res.json({ message: 'User registered successfully', id, name, token });
 });
 
 
