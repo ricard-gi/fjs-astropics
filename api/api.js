@@ -107,6 +107,14 @@ app.get('/api/users', checkToken, async (req, res) => {
     return res.json(users)
 })
 
+// retorna usuaris
+app.get('/api/users/:userId', checkToken, async (req, res) => {
+    const user = users.find(user => user.id === req.userId);
+    if (!user ) {
+        return res.status(401).json({ error: 'User not found' });
+    }
+    return res.json(user)
+})
 
 
 
@@ -207,6 +215,13 @@ app.get('/api/images/hashtag/:hashtag', checkToken, (req, res) => {
 app.get('/api/images/user/:name', checkToken, (req, res) => {
     const name = req.params.name;
     const nameImages = readImages().filter(image => image.userName==name);
+    res.json(nameImages);
+});
+
+// Endpoint per eliminar les imatges per nom
+app.delete('/api/images/:imagename', checkToken, (req, res) => {
+    const imagename = req.params.imagename;
+    const nameImages = readImages().filter(image => image.image==!imagename);
     res.json(nameImages);
 });
 
